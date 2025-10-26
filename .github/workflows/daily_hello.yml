@@ -1,0 +1,28 @@
+name: Upload Hello to Drive
+
+on:
+  schedule:
+    - cron: '0 4 * * *'   # 10h sáng giờ VN = 3h UTC
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    environment: production 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create service account file
+        run: echo '${{ secrets.GDRIVE_CREDENTIALS }}' > service_account.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+
+      - name: Run script
+        run: python upload_to_drive.py
